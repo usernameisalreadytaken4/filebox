@@ -75,15 +75,7 @@ def login():
             db.session.add(user)
             db.session.commit()
             user = User.query.filter_by(nickname=form.nickname.data).first()
-            default_folder = Folder(
-                name=form.nickname.data,
-                parent=None,
-                url=f'{form.nickname.data}',
-                path=f'{form.nickname.data}',
-                owner_id=user.id
-            )
-            db.session.add(default_folder)
-            db.session.commit()
+            Folder.create_default_folder(user.id, user.nickname)
         if user and form.password.data == user.password:
             login_user(user)
             address = Folder.query.filter_by(owner_id=user.id).first()
