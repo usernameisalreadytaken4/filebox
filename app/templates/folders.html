@@ -1,0 +1,55 @@
+{% extends 'index.html' %}
+
+{% block folders %}
+
+{% if g.user.is_authenticated %}
+    <a href={{url_for('logout')}}>Выйти</a>
+{% endif %}
+
+
+
+<a href={{url_for('user',address=folder.url)}}>Создать папку</a>
+{% if parent %}
+
+{% endif %}
+<a href="">Удалить папку</a>
+<p>Загрузить файл</p>
+<form action="" method=post enctype=multipart/form-data>
+    {{form_upload_file.hidden_tag()}}
+    <p>{{form_upload_file.file}}
+        <input type=submit value=загрузить>
+        {% for error in form_upload_file.errors.file %}
+            {{ error}}
+        {% endfor %}
+    </p>
+</form>
+<form action="" method="post" name="login">
+    {{form_create_folder.hidden_tag()}}
+    <p>Создать папку</p>{{form_create_folder.folder_name}}
+        {% for error in form_create_folder.errors.folder_name %}
+            {{ error}}
+        {% endfor %}
+<p><input type="submit" value="создать"></p>
+</form>
+<br>
+
+
+<p><a href={{url_for('user',address=parent.url)}}>/{{folder.path}}</a></p>
+{% if folder_list %}
+{% for folder in folder_list %}
+    <p><a href={{url_for('user',address=folder.url)}}>{{folder.name}}</a></p><hr>
+{% endfor %}
+{% endif %}
+{% if file_list %}
+{% for file in file_list %}
+    <p><a href={{url_for('get_file',address=folder.url,filename=file.inner_link)}}>{{file.file_name}}</a>
+        <a href={{url_for('delete_file',address=folder.url,filename=file.inner_link)}}>удалить файл</a>
+    </p>
+
+<hr>
+
+{% endfor %}
+{% endif %}
+
+
+{% endblock %}

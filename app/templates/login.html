@@ -1,0 +1,33 @@
+<html>
+<head>
+    <title>login</title>
+</head>
+<body>
+<h1>{{title}}</h1>
+<form action="" method="post" name="login">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{message}}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+{{form.hidden_tag()}}
+
+<h2>логин</h2>{{form.nickname}}
+    {% for error in form.errors.nickname %}
+    {{ error}}
+    {% endfor %}
+<br>
+
+<h2>пароль</h2>{{form.password}}
+        {% for error in form.errors.password %}
+    {{ error}}
+    {% endfor %}
+<p><input type="submit" value="войти"></p>
+</form>
+</body>
+
+</html>
