@@ -6,26 +6,6 @@ from .models import User, File, Folder
 from config import UPLOAD_FOLDER
 
 
-@app.route('/<address>/<filename>')
-@login_required
-def get_file(address, filename):
-    return send_from_directory(UPLOAD_FOLDER, filename)
-
-
-@app.route('/del/<address>/<filename>')
-@login_required
-def delete_file(address, filename):
-    File.delete_file(filename, g.user.id)
-    return redirect(url_for('user', address=address))
-
-
-@app.route('/')
-@login_required
-def index():
-    base_folder = Folder.query.filter_by(url=g.user.nickname).first()
-    return redirect(url_for('user', address=base_folder.url))
-
-
 @app.route('/<path:address>', methods=['GET', 'POST'])
 @login_required
 def user(address):
@@ -48,6 +28,26 @@ def user(address):
     return render_template('folders.html', folder=current_folder,
                            folder_list=folder_list, file_list=file_list, parent=parent,
                            form_create_folder=form_create_folder, form_upload_file=form_upload_file)
+
+
+@app.route('/<path:address>/<filename>')
+@login_required
+def get_file(address, filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
+
+
+@app.route('/del/<path:address>/<filename>')
+@login_required
+def delete_file(address, filename):
+    File.delete_file(filename, g.user.id)
+    return redirect(url_for('user', address=address))
+
+
+@app.route('/')
+@login_required
+def index():
+    base_folder = Folder.query.filter_by(url=g.user.nickname).first()
+    return redirect(url_for('user', address=base_folder.url))
 
 
 @app.route('/login', methods=['GET', 'POST'])
