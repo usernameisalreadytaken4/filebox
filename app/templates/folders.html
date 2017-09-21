@@ -43,15 +43,8 @@
 {% if file_list %}
 {% for file in file_list %}
     <p><a href={{url_for('get_file',address=folder.url,filename=file.inner_link)}}>{{file.file_name}}</a>
-        <a href={{url_for('delete_file',address=folder.url,filename=file.inner_link)}}>удалить файл</a>
-        <form>
-            {{form_move_file.hidden_tag()}}
-            <p>Переместить файл</p>{{form_move_file.new_path}}
-            <p><input type="submit" value="переместить"></p>
-                {% for error in form_move_file.errors.new_path %}
-                    {{ error}}
-                {% endfor %}
-        </form>
+       <a href={{url_for('delete_file',address=folder.url,filename=file.inner_link)}}>удалить файл</a>
+       <a href={{url_for('move_file',address=folder.url,file_id=file.id)}}>переместить файл</a>
     </p>
 
 <hr>

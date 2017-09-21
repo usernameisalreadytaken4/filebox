@@ -1,7 +1,8 @@
 from app import db, lm
 from werkzeug.utils import secure_filename
 from config import UPLOAD_FOLDER
-import os
+import os, shutil
+from flask import send_from_directory
 
 
 class User(db.Model):
@@ -43,18 +44,13 @@ class File(db.Model):
         return inner_name
 
     @staticmethod
-    def move_file(inner_name, new_path):
-        file = File.query.filter_by(inner_link=inner_name).first()
-        old_path = inner_name
-        inner_link = f'{str(new_path)}-{str(user)}-{filename}'
-        os.rename(old_path, inner_link)
-        db.query(file).update({'folder_id': new_path}, {'inner_link': inner_link})
+    def move_file(file_id, new_path_id):
+        file = File.query.filter_by(id=file_id).first()
+        new_folder = Folder.query.filter_by(id=new_path_id).first()
+        new_inner_link = f'{str(new_folder.id)}-{str(file.owner_id)}-{file.file_name}'
+        os.rename(os.path.join(UPLOAD_FOLDER, file.inner_link), os.path.join(UPLOAD_FOLDER, new_inner_link))
+        db.session.query(File).filter_by(id=file_id).update({'inner_link': new_inner_link, 'folder_id': new_folder.id})
         db.session.commit()
-      #  return True
-
-   # @staticmethod
-    #def download_file():
-     #   pass
 
     @staticmethod
     def delete_file(inner_name, user_id):

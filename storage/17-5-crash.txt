@@ -1,2 +1,0 @@
-2017-06-13T22:55:08.007Z Crashed, minidump saved at Z:\home\bobrovskiy\Downloads\54a7d19a-517d-4383-96ad-78bc3e9e7d23.dmp
-2017-06-13T22:55:09.593Z Crash dump uploaded - RESULT_SUCCEEDED

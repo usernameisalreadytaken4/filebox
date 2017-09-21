@@ -1,0 +1,22 @@
+{% extends 'index.html' %}
+
+{% block folders %}
+
+{% if g.user.is_authenticated %}
+    <a href={{url_for('logout')}}>Выйти</a>
+{% endif %}
+
+<p><a href={{url_for('user',address=current_folder.url)}}>/{{current_folder.path}}</a></p>
+<form action="" method="post" name="move_file">
+    {{form_move_file.hidden_tag()}}
+    <p>Переместить файл {{filename}}</p>
+    {{form_move_file.new_path}}
+     {% for error in form_move_file.errors.new_path %}
+            {{ error}}
+        {% endfor %}
+    <p><input type="submit" value="переместить"></p>
+</form>
+
+<hr>
+
+{% endblock %}

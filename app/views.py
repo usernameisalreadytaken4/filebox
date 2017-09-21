@@ -21,9 +21,6 @@ def user(address):
     current_folder = Folder.query.filter_by(url=address).first()
     form_create_folder = CreateFolder()
     form_upload_file = UploadFile()
-    form_move_file = MoveFile()
-    if form_move_file.is_submitted():
-        return redirect(url_for('move_file', address=form_move_file.new_path.data, filename=''))
     # пытаемся создать папку
     if form_create_folder.validate_on_submit():
         folder = Folder.create_folder(g.user.id, form_create_folder.folder_name.data, current_folder)
@@ -32,20 +29,22 @@ def user(address):
     if form_upload_file.validate_on_submit():
         File.upload_file(form_upload_file.file.data, current_folder.id, g.user.id)
         return redirect(url_for('user', address=address))
-    folder_list = Folder.query.filter_by(parent=current_folder.id).all()
+    folder_list = Folder.query.filter_by(parent=current_folder.id).order_by(Folder.name.desc()).all() # вот тут ошибка, но при этом все работает
+
     parent = Folder.query.filter_by(id=current_folder.parent).first()
     file_list = File.query.filter_by(folder_id=current_folder.id).all()
     return render_template('folders.html', folder=current_folder,
                            folder_list=folder_list, file_list=file_list, parent=parent,
-                           form_create_folder=form_create_folder, form_upload_file=form_upload_file,
-                           form_move_file=form_move_file)
+                           form_create_folder=form_create_folder, form_upload_file=form_upload_file)
 
 
 @app.route('/get/<path:address>/<filename>', methods=['GET'])
 @login_required
 def get_file(address, filename):
     print('getfile', '---'*10)
-    return send_from_directory(UPLOAD_FOLDER, filename)
+    folder = Folder.query.filter_by(url=address).first()
+    file = File.query.filter_by(inner_link=filename, folder_id=folder.id).first()
+    return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True, attachment_filename=file.file_name)
 
 
 @app.route('/del/<path:address>/<filename>')
@@ -56,12 +55,20 @@ def delete_file(address, filename):
     return redirect(url_for('user', address=address))
 
 
-@app.route('/move/<path:new_address>/<filename>')
+@app.route('/move/<path:address>/<file_id>', methods=['GET', 'POST'])
 @login_required
-def move_file(new_address, filename):
+def move_file(address, file_id):
     print('move_file', '---' * 10)
-    File.move_file(filename, new_address)
-    return redirect(url_for('user', address=new_address))
+    form_move_file = MoveFile()
+    current_folder = Folder.query.filter_by(url=address).first()
+    filename = File.query.filter_by(id=file_id).first()
+    if form_move_file.validate_on_submit():
+        new_folder = Folder.query.filter_by(path=form_move_file.new_path.data, owner_id=g.user.id).first()
+        print('new_folder is here', '<===='*10)
+        File.move_file(file_id, new_folder.id)
+        return redirect(url_for('user', address=new_folder.url))
+    return render_template('move_file.html', filename=filename.file_name,
+                           current_folder=current_folder, form_move_file=form_move_file)
 
 
 @app.route('/login', methods=['GET', 'POST'])
