@@ -43,12 +43,18 @@ class File(db.Model):
         return inner_name
 
     @staticmethod
-    def move_file():
-        pass
+    def move_file(inner_name, new_path):
+        file = File.query.filter_by(inner_link=inner_name).first()
+        old_path = inner_name
+        inner_link = f'{str(new_path)}-{str(user)}-{filename}'
+        os.rename(old_path, inner_link)
+        db.query(file).update({'folder_id': new_path}, {'inner_link': inner_link})
+        db.session.commit()
+      #  return True
 
-    @staticmethod
-    def download_file():
-        pass
+   # @staticmethod
+    #def download_file():
+     #   pass
 
     @staticmethod
     def delete_file(inner_name, user_id):

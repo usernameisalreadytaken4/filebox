@@ -14,3 +14,7 @@ class CreateFolder(FlaskForm):
 
 class UploadFile(FlaskForm):
     file = FileField(validators=[DataRequired()])
+
+
+class MoveFile(FlaskForm):
+    new_path = StringField('new_path', validators=[DataRequired()])
